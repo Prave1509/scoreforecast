@@ -6,3 +6,5 @@ gunicorn
 streamlit
 flask-cors
 matplotlib
+plotly
+os
