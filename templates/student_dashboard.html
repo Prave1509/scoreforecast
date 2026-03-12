@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+
+<body>
+
+
+<div class="container">
+    <h2>Welcome Student</h2>
+
+    <p>What do you want to check?</p>
+    <p><em>The buttons below launch separate Streamlit applications; ensure those servers are running.</em></p>
+
+    <button class="main-btn" onclick="nextSem()">📊 Next Semester Marks</button>
+
+    <button class="main-btn" onclick="finalSem()">🎓 Final Semester Result</button>
+</div>
+
+<script src="{{ url_for('static', filename='js/student_dashboard.js') }}"></script>
+
+</body>
+</html>

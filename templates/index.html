@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ScoreForecast</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Style+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <a href="#" class="logo">ScoreForecast</a>
+        <nav>
+            <ul class="nav-links"> 
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <a class="sign-up" href="{{ url_for('role_select') }}">Log-in/Sign-up</a>
+    </header>
+
+    <!-- HOME SECTION -->
+    <section class="home" id="home">
+        <div class="home-text">
+            <h1>Student Performance Prediction System</h1>
+            <p>
+                This application uses machine learning techniques to analyze student
+                academic data and predict their future performance.
+            </p>
+            <p>
+                The goal of this webpage is to predict student academic scores and
+                help students understand their performance.
+            </p>
+            <button class="home-btn"><a href="{{ url_for('learn_more') }}">Learn More</a></button>
+        </div>
+
+        <div class="home-image">
+            <img src="{{ url_for('static', filename='images/Student_AIM.png') }}" alt="Student Illustration">
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="about" id="about">
+        <div class="about-container">
+            <div class="about-text">
+                <h2>About ScoreForecast</h2>
+                <p>
+                    ScoreForecast is a smart academic support platform designed to help
+                    students understand their potential performance before final results.
+                    Many students struggle to identify academic risks early, and this
+                    platform aims to solve that problem.
+                </p>
+                <p>
+                    By providing early insights into student performance, ScoreForecast
+                    enables better study planning, informed decision-making, and timely
+                    improvement. The goal is to support students in achieving better
+                    academic outcomes with clarity and confidence.
+                </p>
+                <ul>
+                    <li>📊 Early performance insights for students</li>
+                    <li>🎯 Simple and student-friendly experience</li>
+                    <li>📈 Supports smarter academic planning</li>
+                </ul>
+            </div>
+
+            <div class="about-box">
+                <h3>Our Vision</h3>
+                <p>
+                    To empower students and educators with data-driven insights that
+                    encourage smarter learning, early intervention, and continuous
+                    academic growth.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <div class="contact-container" id="contact">
+        <h1>Contact Us</h1>
+        <p>
+            Have questions or feedback about the Student Performance Prediction system?
+            Feel free to reach out.
+        </p>
+
+        <form class="contact-form" action="https://formsubmit.co/praveenprave1509@gmail.com" method="POST">
+            <label>Full Name</label>
+            <input type="text" name="name" placeholder="Enter your name" required>
+
+            <label>Email Address</label>
+            <input type="email" name="email" placeholder="Enter your email" required>
+
+            <label>Subject</label>
+            <input type="text" name="subject" placeholder="Enter the subject" required>
+
+            <label>Message</label>
+            <textarea rows="5" name="msg" placeholder="Write your message..." required></textarea>
+
+            <button type="submit">Send Message</button>
+        </form>
+
+        <div class="contact-info">
+            <p><strong>Email:</strong> praveenprave1509@gmail.com</p>
+            <p><strong>GitHub:</strong> <a href="https://github.com/Prave1509" target="_blank" rel="noopener noreferrer">Visit my GitHub</a></p>
+            <p><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/praveen1509" target="_blank" rel="noopener noreferrer">Visit my Linkedin</a></p>
+        </div>
+    </div>
+</body>
+</html>

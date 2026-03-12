@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+    .table-container { margin-bottom: 2rem; }
+    /* ensure tables fit inside the white container */
+    table { width: 100%; max-width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f0f0f0; }
+    .actions button { margin-right: 4px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Admin Dashboard</h2>
+    <div class="table-container">
+        <h3>Students</h3>
+        <table id="studentsTable">
+            <thead><tr><th>ID</th><th>Name</th><th>Student ID</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="table-container">
+        <h3>Teachers</h3>
+        <table id="teachersTable">
+            <thead><tr><th>ID</th><th>Name</th><th>Teacher ID</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="table-container">
+        <h3>Prediction History</h3>
+        <table id="predictionsTable">
+            <thead><tr><th>ID</th><th>Source</th><th>User ID</th><th>Mark</th><th>Result</th><th>Timestamp</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
+</body>
+</html>

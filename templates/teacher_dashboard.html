@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+    
+    <div class="container">
+        <h2>Teacher Dashboard</h2>
+        <p>This area is dedicated to teacher predictions and data uploads.</p>
+        <p><em>Clicking the button below will open the separate Streamlit dashboard in a new tab</em></p>
+        <button class="main-btn" onclick="finalSem()">🎓 Analyse Here..!</button>
+    </div>
+    <script src="{{ url_for('static', filename='js/teacher_dashboard.js') }}"></script>
+</body>
+</html>

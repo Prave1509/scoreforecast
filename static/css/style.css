@@ -1,0 +1,359 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lobster&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Style+Script&display=swap');
+
+
+*
+{
+     font-family: "poppins", sans-serif;
+     margin:0;
+     padding:0;
+}
+
+/* make any table full-width and collapse borders for better responsiveness */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+a{
+    text-decoration: none;
+    color:white;
+}
+body{
+    background-color: white;
+    overflow-x: hidden;
+}
+html
+{
+    scroll-behavior: smooth;
+}
+section {
+    scroll-margin-top: 120px; /* adjust to navbar height */
+}
+header
+{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 10%;
+    background-color: mediumblue;
+}
+.logo
+{
+    cursor: pointer;
+    font-size: 25px;
+    text-transform:capitalize;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+.nav-links
+{
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+.nav-links li
+{
+    padding:0 20px;
+}
+.nav-links li a:hover
+{
+    color:black;
+    transition: 0.5s;
+}
+ .sign-up
+{
+    padding:5px 10px;
+    background-color:black;
+    border-radius:50px;
+}
+ .sign-up:hover
+{
+    background-color: white;
+    color:black;
+    cursor: pointer;
+    transition: 0.5s;
+}
+.home {
+    display: flex;                 /* puts items side by side */
+    align-items: center;           /* vertical center */
+    justify-content: space-between;
+    padding: 60px;
+    margin-top: 100px;
+}
+
+.home-text {
+    width: 55%;
+}
+
+.home-text h1 {
+    color: #0a1f44;                /* suits mediumblue navbar */
+    font-size: 42px;
+    margin-bottom: 20px;
+}
+
+.home-text p {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #444;
+    margin-bottom: 15px;
+}
+
+.home-image {
+    width: 40%;
+    display: flex;
+    justify-content: center;
+}
+
+.home-image img {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px; /* smooth corners */
+    background: white;
+    padding: 20px;
+
+    /* soft shadow */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+
+    /* smooth animation */
+    transition: all 0.4s ease;
+}
+
+.home-image img:hover {
+    transform: translateY(-12px) scale(1.03);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+}
+
+.home-image::before {
+    content: "";
+    position: absolute;
+    width: 80vw;
+    height: 80vw;
+    max-width: 400px;
+    max-height: 400px;
+    background: rgba(0, 0, 255, 0.1);
+    filter: blur(80px);
+    z-index: -1;
+}
+
+
+.home-btn
+{
+    background-color: black;     /* button color */
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    font-size: 16px;
+    border-radius: 50px;              /* makes button round */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-top: 20px;
+}
+.home-btn:hover {
+    background-color: mediumblue;        
+    transform: translateY(-3px);      /* slight lift */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    color:white;
+}
+
+.about {
+    padding: 80px 10%;
+    background-color: #f7f9ff;
+}
+
+.about-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+}
+
+.about-text {
+    width: 60%;
+}
+
+.about-text h2 {
+    font-size: 36px;
+    color: #0a1f44;
+    margin-bottom: 20px;
+}
+
+.about-text p {
+    font-size: 18px;
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.about-text ul {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+.about-text ul li {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.about-box {
+    width: 35%;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.about-box h3 {
+    margin-bottom: 10px;
+    color: mediumblue;
+}
+
+
+.contact-container {
+    max-width: 600px;
+    margin: 60px auto;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+    color: mediumblue;
+}
+
+p {
+    text-align: center;
+    color:black;
+    margin-bottom: 30px;
+}
+
+.contact-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: mediumblue;
+}
+
+.contact-form button {
+    width: 100%;
+    padding: 14px;
+    background: mediumblue;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.contact-form button:hover {
+    background: #1a2cff;
+}
+
+.contact-info {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 14px;
+    color:black;
+}
+.contact-info p a 
+{
+    color:black;
+}
+/* responsive media and utility */
+
+img, video, canvas, iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* media queries for tablets and mobiles */
+@media (max-width: 900px) {
+    header {
+        padding: 15px 5%;
+    }
+    .nav-links li {
+        padding: 0 10px;
+    }
+    .home {
+        flex-direction: column;
+        padding: 40px 20px;
+    }
+    .home-text {
+        width: 100%;
+        text-align: center;
+    }
+    .home-image {
+        width: 100%;
+        margin-top: 20px;
+    }
+    .home-btn {
+        margin-left: 0;
+        margin-top: 20px;
+        width: auto;
+    }
+    .about-container {
+        flex-direction: column;
+    }
+    .about-text,
+    .about-box {
+        width: 100%;
+    }
+    .about-box {
+        margin-top: 20px;
+    }
+    .contact-container {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .nav-links {
+        margin-top: 10px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .home-text h1 {
+        font-size: 32px;
+    }
+    .home-text p {
+        font-size: 16px;
+    }
+    .about-text h2 {
+        font-size: 28px;
+    }
+    .about-text p,
+    .about-text ul li {
+        font-size: 16px;
+    }
+    .about-box {
+        padding: 20px;
+    }
+    .contact-form button {
+        font-size: 14px;
+        padding: 12px;
+    }
+}

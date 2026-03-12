@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Semester Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+    
+    <h1>Next Semester Prediction</h1>
+    <p>This page will allow students to input details for next semester forecasting.</p>
+
+    <form method="post" class="prediction-form">
+        <label>Previous Score
+            <input type="number" name="prev_score" min="0" max="100" required>
+        </label>
+        <label>Attendance (%)
+            <input type="number" name="attendance" min="0" max="100" required>
+        </label>
+        <label>Arrears Count
+            <input type="number" name="arrears" min="0" max="10" required>
+        </label>
+        <label>Study Hours/Day
+            <input type="number" name="study_hrs" min="0" max="15" required>
+        </label>
+        <label>Sleep Hours/Day
+            <input type="number" name="sleep_hrs" min="0" max="12" required>
+        </label>
+        <label>Travel Time (min)
+            <input type="number" name="travel_time" min="0" max="120" required>
+        </label>
+        <label>Stress Level
+            <select name="stress">
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+            </select>
+        </label>
+        <label>Social Media Usage
+            <select name="social">
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+            </select>
+        </label>
+        <label>Unlimited Internet?
+            <select name="internet">
+                <option>Yes</option>
+                <option>No</option>
+            </select>
+        </label>
+        <label>Student Type
+            <select name="student_type">
+                <option>Hosteller</option>
+                <option>Day Scholar</option>
+            </select>
+        </label>
+        <label>Part-time Job?
+            <select name="part_time">
+                <option>Yes</option>
+                <option>No</option>
+            </select>
+        </label>
+        <button type="submit" class="main-btn">Predict</button>
+    </form>
+
+    {% if prediction %}
+    <div class="prediction-result">
+        <h2>Result</h2>
+        <p><strong>Status:</strong> {{ prediction.status }}</p>
+        <p><strong>Estimated score:</strong> {{ prediction.score }}</p>
+    </div>
+    {% endif %}
+</body>
+</html> 

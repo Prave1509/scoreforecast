@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Signup</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+
+<body>
+
+
+<div class="container">
+    <h2>Teacher Sign Up</h2>
+    <form id="teacherSignupForm">
+        <input type="text" id="name" placeholder="Name" required>
+        <p class="note">A unique Teacher ID will be generated for you after signup.</p>
+        <input type="password" id="password" placeholder="Password" required 
+               pattern="^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$" 
+               title="Password must be at least 8 characters long, include one number and one special character">
+        <button type="submit" class="main-btn">Sign Up</button>
+    </form>
+    <p>Already have an account? <a href="{{ url_for('teacher_login') }}">Login</a></p>
+</div>
+<script src="{{ url_for('static', filename='js/teacher_signup.js') }}"></script>
+
+
+</body>
+</html>

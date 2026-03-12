@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Login</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+
+<body>
+
+
+<div class="container">
+    <h2>Teacher Login</h2>
+    <form id="teacherLoginForm">
+        <input type="text" id="teacher_id" placeholder="Teacher ID" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit" class="main-btn">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{{ url_for('teacher_signup') }}">Sign Up</a></p>
+</div>
+<script src="{{ url_for('static', filename='js/teacher_login.js') }}"></script>
+
+</body>
+</html>
