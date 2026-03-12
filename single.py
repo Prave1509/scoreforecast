@@ -91,8 +91,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 model_dir = os.path.join(BASE_DIR, "models")
 clf_file = os.path.join(model_dir, "best_classification_model.joblib")
 
-st.write("Looking for model at:", clf_file)
-st.write("Exists?", os.path.exists(clf_file))
+#st.write("Looking for model at:", clf_file)
+#st.write("Exists?", os.path.exists(clf_file))
 
 @st.cache_data(show_spinner=False)
 def load_models():
