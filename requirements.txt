@@ -8,3 +8,4 @@ flask-cors
 matplotlib
 plotly
 openpyxl
+werkzeug

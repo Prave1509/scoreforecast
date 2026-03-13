@@ -5,25 +5,129 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Teacher Signup</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+<style>
+  input {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: Poppins, Arial;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input:focus {
+    border-color: #0d1bd1;
+    box-shadow: 0 0 0 3px rgba(13,27,209,0.1);
+  }
+
+  input.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220,53,69,0.1);
+  }
+
+  .main-btn {
+    border-radius: 6px;
+    font-family: Poppins, Arial;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .main-btn:hover  { background: #0a14a8; }
+  .main-btn:active { transform: scale(0.98); }
+  .main-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .container h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #0d1bd1;
+    margin-bottom: 6px;
+  }
+
+  .field { text-align: left; margin-bottom: 4px; }
+
+  .field label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .error-msg {
+    font-size: 0.78rem;
+    color: #dc3545;
+    margin: 3px 0 8px;
+    display: none;
+    text-align: left;
+  }
+
+  .error-msg.show { display: block; }
+
+  .alert-box {
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    text-align: left;
+    display: none;
+    font-weight: 600;
+  }
+
+  .alert-box.show         { display: block; }
+  .alert-box.show-error   { background: #fff3f3; border: 1px solid #f5c2c7; color: #dc3545; }
+  .alert-box.show-success { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; }
+
+  .pass-rules {
+    font-size: 0.75rem;
+    color: #888;
+    text-align: left;
+    margin: -4px 0 8px;
+    line-height: 1.5;
+  }
+</style>
 </head>
 
 <body>
 
+<button class="home-btn" onclick="window.location.href='{{ url_for('home') }}'">Home</button>
 
 <div class="container">
-    <h2>Teacher Sign Up</h2>
-    <form id="teacherSignupForm">
-        <input type="text" id="name" placeholder="Name" required>
-        <p class="note">A unique Teacher ID will be generated for you after signup.</p>
-        <input type="password" id="password" placeholder="Password" required 
-               pattern="^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$" 
-               title="Password must be at least 8 characters long, include one number and one special character">
-        <button type="submit" class="main-btn">Sign Up</button>
-    </form>
-    <p>Already have an account? <a href="{{ url_for('teacher_login') }}">Login</a></p>
+  <h2>Teacher Sign Up</h2>
+
+  <div class="alert-box" id="alertBox"></div>
+
+  <form id="teacherSignupForm" novalidate>
+
+    <div class="field">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="Enter your full name" required autocomplete="off">
+      <div class="error-msg" id="nameError"></div>
+    </div>
+
+    <p class="note">A unique Teacher ID (e.g. TEC001) will be generated for you after signup.</p>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Create a password" required>
+      <div class="pass-rules">Min 8 characters • At least 1 number • At least 1 special character (!@#$%^&*)</div>
+      <div class="error-msg" id="passError"></div>
+    </div>
+
+    <div class="field">
+      <label for="confirm_password">Confirm Password</label>
+      <input type="password" id="confirm_password" placeholder="Re-enter your password" required>
+      <div class="error-msg" id="confirmError"></div>
+    </div>
+
+    <button type="submit" class="main-btn" id="signupBtn">Sign Up</button>
+  </form>
+
+  <p>Already have an account? <a href="{{ url_for('teacher_login_page') }}">Login</a></p>
 </div>
+
 <script src="{{ url_for('static', filename='js/teacher_signup.js') }}"></script>
-
-
 </body>
 </html>
