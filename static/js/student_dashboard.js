@@ -1,7 +1,7 @@
 function nextSem(){
     // open the standalone Streamlit prediction app (single.py)
     const id = localStorage.getItem('student_id');
-    let url = "https://streamlit-app-1-o39s.onrender.com"; // assume student runs `streamlit run single.py`
+    let url = "https://streamlit-app-r2ld.onrender.com"; // assume student runs `streamlit run single.py`
     if (id) url += `?student_id=${encodeURIComponent(id)}`;
     window.open(url, '_blank');
 }
