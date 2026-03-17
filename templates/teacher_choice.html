@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Select Prediction Type</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      background: linear-gradient(135deg, #1a3adb 0%, #2255ff 50%, #3b6fff 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 20px;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 50px 60px 40px;
+      width: 100%;
+      max-width: 750px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1.5px solid #c8d0ee;
+      color: #2a3bb5;
+      background: #f3f5fc;
+      padding: 10px 28px;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      color: #0a0a0a;
+      font-size: 2.6rem;
+      font-weight: 900;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      color: #777;
+      font-size: 1rem;
+      margin-bottom: 40px;
+    }
+
+    .cards {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background: #eef0f7;
+      border: 1.5px solid #dde2f0;
+      border-radius: 20px;
+      padding: 40px 32px 32px;
+      width: 260px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-align: center;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(26,58,219,0.15);
+      border-color: #9aaaf5;
+    }
+
+    .card .icon {
+      font-size: 3rem;
+      margin-bottom: 18px;
+      display: block;
+    }
+
+    .card h2 {
+      color: #0a0a0a;
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .card p {
+      color: #666;
+      font-size: 0.85rem;
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+
+    .card .btn {
+      width: 100%;
+      padding: 20px 12px;
+      background: #ffffff;
+      color: #0a0a0a;
+      border: 1.5px solid #c5cce8;
+      border-radius: 14px;
+      font-family: 'Poppins', Arial;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .card .btn:hover {
+      background: #eef0f7;
+      border-color: #2a3bb5;
+      color: #2a3bb5;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 32px;
+      color: #aaa;
+      font-size: 0.87rem;
+      text-decoration: none;
+      font-family: 'Poppins', Arial;
+    }
+
+    .back-link:hover { color: #2a3bb5; }
+
+    @media (max-width: 580px) {
+      .container { padding: 36px 20px 30px; }
+      h1 { font-size: 1.8rem; }
+      .card { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="badge">🎓 Teacher Portal</div>
+  <h1>What do you want to predict?</h1>
+  <p class="subtitle">Choose the type of semester prediction to continue</p>
+
+  <div class="cards">
+    <div class="card" onclick="goNextSem()">
+      <span class="icon">📈</span>
+      <h2>Next Semester</h2>
+      <p>Predict student performance for the upcoming semester based on current data.</p>
+      <button class="btn">Predict Next Sem</button>
+    </div>
+
+    <div class="card" onclick="goFinalSem()">
+      <span class="icon">🎯</span>
+      <h2>Final Semester</h2>
+      <p>Forecast final semester outcomes to help students prepare for their last stretch.Click Here..!</p>
+      <button class="btn">Predict Final Sem</button>
+    </div>
+  </div>
+
+  <a href="/teacher_login" class="back-link">← Back to Login</a>
+</div>
+
+<script src="{{ url_for('static', filename='js/teacher_dashboard.js') }}"></script>
+<script>
+  function goNextSem() { nextSem(); }
+  function goFinalSem() { finalSem(); }
+</script>
+
+</body>
+</html>

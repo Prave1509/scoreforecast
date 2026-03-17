@@ -15,7 +15,7 @@ if (teacherLogin) {
             const data = await response.json();
             console.log('teacher login response', data);
             if (data.status === 'success') {
-                window.location.href = '/teacher_dashboard';
+                window.location.href = '/teacher_choice';
             } else if (data.status === 'invalid') {
                 alert('Invalid ID or Password');
             } else {

@@ -373,6 +373,10 @@ def teacher_login():
 
     return jsonify({"status": "invalid"})
 
+@app.route("/teacher_choice")
+def teacher_choice_page():
+    return render_template("teacher_choice.html")
+
 
 # ---------- ADMIN LOGIN ----------
 
