@@ -1,5 +1,10 @@
 console.log('admin_dashboard.js loaded');
 
+// ─── Global State ────────────────────────────────────────────────────────────
+let allStudents = [];
+let allTeachers = [];
+let allPredictions = [];
+
 // ─── Popup (matches your existing .popup style) ───────────────────────────────
 function showToast(message, type = 'success') {
   const popup = document.getElementById('popup');
@@ -53,24 +58,100 @@ let deleteState = { type: null, id: null };
 
 // ─── Fetch & Populate ─────────────────────────────────────────────────────────
 async function fetchAndPopulate() {
+  showLoading(true);
   try {
-    const [stuRes, teaRes, predRes] = await Promise.all([
+    const [stuRes, teaRes, predRes, statsRes] = await Promise.all([
       fetch('/admin/students'),
       fetch('/admin/teachers'),
-      fetch('/admin/predictions')
+      fetch('/admin/predictions'),
+      fetch('/admin/stats')
     ]);
     const studentsData = await stuRes.json();
     const teachersData = await teaRes.json();
     const predsData    = await predRes.json();
+    const statsData    = await statsRes.json();
 
-    populateStudents(studentsData.students   || []);
-    populateTeachers(teachersData.teachers   || []);
-    populatePredictions(predsData.predictions || []);
+    allStudents = studentsData.students || [];
+    allTeachers = teachersData.teachers || [];
+    allPredictions = predsData.predictions || [];
+
+    updateStats(statsData);
+    renderChart(statsData);
+    populateStudents(allStudents);
+    populateTeachers(allTeachers);
+    populatePredictions(allPredictions);
   } catch (err) {
     console.error('Error loading admin data', err);
     showToast('Failed to load data from server.', 'error');
+  } finally {
+    showLoading(false);
   }
 }
+
+// ─── Update Stats ────────────────────────────────────────────────────────────
+function updateStats(stats) {
+  document.getElementById('totalStudents').textContent = stats.students;
+  document.getElementById('totalTeachers').textContent = stats.teachers;
+  document.getElementById('totalPredictions').textContent = stats.predictions;
+}
+
+// ─── Render Chart ────────────────────────────────────────────────────────────
+function renderChart(stats) {
+  const ctx = document.getElementById('overviewChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Students', 'Teachers', 'Predictions'],
+      datasets: [{
+        label: 'Count',
+        data: [stats.students, stats.teachers, stats.predictions],
+        backgroundColor: ['#0d1bd1', '#28a745', '#ffc107'],
+        borderColor: ['#0a14a8', '#1e7e34', '#e0a800'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+// ─── Loading Indicator ───────────────────────────────────────────────────────
+function showLoading(show) {
+  document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+}
+
+// ─── Tabs ────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab + 'Section').classList.add('active');
+  });
+});
+
+// ─── Search ──────────────────────────────────────────────────────────────────
+document.getElementById('studentSearch').addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase();
+  const filtered = allStudents.filter(s =>
+    s.name.toLowerCase().includes(query) || s.student_id.toLowerCase().includes(query)
+  );
+  populateStudents(filtered);
+});
+
+document.getElementById('teacherSearch').addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase();
+  const filtered = allTeachers.filter(t =>
+    t.name.toLowerCase().includes(query) || t.teacher_id.toLowerCase().includes(query)
+  );
+  populateTeachers(filtered);
+});
 
 // ─── Populate functions ───────────────────────────────────────────────────────
 function populateStudents(list) {

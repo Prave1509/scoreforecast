@@ -6,7 +6,139 @@
 <title>Admin Dashboard</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
+  /* ── Summary Cards ── */
+  .summary-cards {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+
+  .card {
+    flex: 1;
+    min-width: 200px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #e8ecff;
+    text-align: center;
+  }
+
+  .card h4 {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .card .count {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0d1bd1;
+    margin: 0;
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e8ecff;
+  }
+
+  .tab-btn {
+    padding: 10px 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #666;
+    font-family: Poppins, Arial;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    color: #0d1bd1;
+    border-bottom-color: #0d1bd1;
+  }
+
+  .tab-btn:hover {
+    color: #0d1bd1;
+  }
+
+  /* ── Sections ── */
+  .section {
+    display: none;
+  }
+
+  .section.active {
+    display: block;
+  }
+
+  /* ── Search ── */
+  .search-container {
+    margin-bottom: 15px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: Poppins, Arial;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus {
+    border-color: #0d1bd1;
+  }
+
+  /* ── Chart ── */
+  .chart-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #e8ecff;
+  }
+
+  .chart-container h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0d1bd1;
+    margin-bottom: 15px;
+  }
+
+  /* ── Loading ── */
+  .loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+  }
+
+  .spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0d1bd1;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
   /* ── Override container for dashboard (wider) ── */
   body { align-items: flex-start; padding: 30px 20px; }
 
@@ -363,45 +495,92 @@
     <button class="logout-btn" onclick="window.location.href='/admin_logout'">Logout</button>
   </div>
 
-  <!-- Students -->
-  <div class="table-container">
-    <div class="section-head">
-      <h3>Students</h3>
-      <span class="count-badge" id="studentCount">0</span>
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="card">
+      <h4>Total Students</h4>
+      <p class="count" id="totalStudents">0</p>
     </div>
-    <div class="table-wrap">
-      <table id="studentsTable">
-        <thead><tr><th>ID</th><th>Name</th><th>Student ID</th><th>Actions</th></tr></thead>
-        <tbody></tbody>
-      </table>
+    <div class="card">
+      <h4>Total Teachers</h4>
+      <p class="count" id="totalTeachers">0</p>
     </div>
-  </div>
-
-  <!-- Teachers -->
-  <div class="table-container">
-    <div class="section-head">
-      <h3>Teachers</h3>
-      <span class="count-badge" id="teacherCount">0</span>
-    </div>
-    <div class="table-wrap">
-      <table id="teachersTable">
-        <thead><tr><th>ID</th><th>Name</th><th>Teacher ID</th><th>Actions</th></tr></thead>
-        <tbody></tbody>
-      </table>
+    <div class="card">
+      <h4>Total Predictions</h4>
+      <p class="count" id="totalPredictions">0</p>
     </div>
   </div>
 
-  <!-- Predictions -->
-  <div class="table-container">
-    <div class="section-head">
-      <h3>Prediction History</h3>
-      <span class="count-badge" id="predCount">0</span>
+  <!-- Chart -->
+  <div class="chart-container">
+    <h3>Overview Chart</h3>
+    <canvas id="overviewChart"></canvas>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="students">Students</button>
+    <button class="tab-btn" data-tab="teachers">Teachers</button>
+    <button class="tab-btn" data-tab="predictions">Predictions</button>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div class="loading" id="loadingIndicator">
+    <div class="spinner"></div>
+    Loading data...
+  </div>
+
+  <!-- Students Section -->
+  <div class="section active" id="studentsSection">
+    <div class="table-container">
+      <div class="section-head">
+        <h3>Students</h3>
+        <span class="count-badge" id="studentCount">0</span>
+      </div>
+      <div class="search-container">
+        <input type="text" class="search-input" id="studentSearch" placeholder="Search students by name or ID...">
+      </div>
+      <div class="table-wrap">
+        <table id="studentsTable">
+          <thead><tr><th>ID</th><th>Name</th><th>Student ID</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
-    <div class="table-wrap">
-      <table id="predictionsTable">
-        <thead><tr><th>ID</th><th>Source</th><th>User ID</th><th>Mark</th><th>Result</th><th>Timestamp</th></tr></thead>
-        <tbody></tbody>
-      </table>
+  </div>
+
+  <!-- Teachers Section -->
+  <div class="section" id="teachersSection">
+    <div class="table-container">
+      <div class="section-head">
+        <h3>Teachers</h3>
+        <span class="count-badge" id="teacherCount">0</span>
+      </div>
+      <div class="search-container">
+        <input type="text" class="search-input" id="teacherSearch" placeholder="Search teachers by name or ID...">
+      </div>
+      <div class="table-wrap">
+        <table id="teachersTable">
+          <thead><tr><th>ID</th><th>Name</th><th>Teacher ID</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Predictions Section -->
+  <div class="section" id="predictionsSection">
+    <div class="table-container">
+      <div class="section-head">
+        <h3>Prediction History</h3>
+        <span class="count-badge" id="predCount">0</span>
+      </div>
+      <div class="table-wrap">
+        <table id="predictionsTable">
+          <thead><tr><th>ID</th><th>Source</th><th>User ID</th><th>Mark</th><th>Result</th><th>Timestamp</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

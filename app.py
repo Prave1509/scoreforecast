@@ -118,47 +118,47 @@ def admin_logout():
 
 
 def _compute_prediction(form, student_id=None, source="next_sem"):
-    prev_score   = float(form.get("prev_score", 0))
-    attendance   = float(form.get("attendance", 0))
-    arrears      = float(form.get("arrears", 0))
-    study_hrs    = float(form.get("study_hrs", 0))
-    sleep_hrs    = float(form.get("sleep_hrs", 0))
-    travel_time  = float(form.get("travel_time", 0))
-    stress       = form.get("stress")
-    social       = form.get("social")
-    internet     = form.get("internet")
+    prev_score = float(form.get("prev_score", 0))
+    attendance = float(form.get("attendance", 0))
+    arrears = float(form.get("arrears", 0))
+    study_hrs = float(form.get("study_hrs", 0))
+    sleep_hrs = float(form.get("sleep_hrs", 0))
+    travel_time = float(form.get("travel_time", 0))
+    stress = form.get("stress")
+    social = form.get("social")
+    internet = form.get("internet")
     student_type = form.get("student_type")
-    part_time    = form.get("part_time")
+    part_time = form.get("part_time")
 
     input_data = {
-        "previous_score":          prev_score,
-        "attendance":              attendance,
-        "arrears_count":           arrears,
-        "study_hours":             study_hrs,
-        "sleep_hours":             sleep_hrs,
-        "travel_time":             travel_time,
-        "social_media_usage_Low":  1 if social == "Low" else 0,
+        "previous_score": prev_score,
+        "attendance": attendance,
+        "arrears_count": arrears,
+        "study_hours": study_hrs,
+        "sleep_hours": sleep_hrs,
+        "travel_time": travel_time,
+        "social_media_usage_Low": 1 if social == "Low" else 0,
         "social_media_usage_Medium": 1 if social == "Medium" else 0,
-        "stress_level_Low":        1 if stress == "Low" else 0,
-        "stress_level_Medium":     1 if stress == "Medium" else 0,
+        "stress_level_Low": 1 if stress == "Low" else 0,
+        "stress_level_Medium": 1 if stress == "Medium" else 0,
         "internet_access_Unlimited": 1 if internet == "Yes" else 0,
-        "student_type_Hosteller":  1 if student_type == "Hosteller" else 0,
-        "part_time_job_Yes":       1 if part_time == "Yes" else 0,
-        "result_Pass":             1,
+        "student_type_Hosteller": 1 if student_type == "Hosteller" else 0,
+        "part_time_job_Yes": 1 if part_time == "Yes" else 0,
+        "result_Pass": 1,
     }
 
-    features  = np.array(list(input_data.values())).reshape(1, -1)
+    features = np.array(list(input_data.values())).reshape(1, -1)
     model_dir = os.path.join(BASE_DIR, "models")
-    clf       = joblib.load(os.path.join(model_dir, "best_classification_model.joblib"))
-    reg       = joblib.load(os.path.join(model_dir, "best_regression_model.joblib"))
+    clf = joblib.load(os.path.join(model_dir, "best_classification_model.joblib"))
+    reg = joblib.load(os.path.join(model_dir, "best_regression_model.joblib"))
 
     status_pred = clf.predict(features)[0]
-    score_pred  = reg.predict(features)[0]
-    status      = "Pass" if status_pred == 1 else "Fail"
-    score       = round(score_pred, 2)
+    score_pred = reg.predict(features)[0]
+    status = "Pass" if status_pred == 1 else "Fail"
+    score = round(score_pred, 2)
 
     conn = sqlite3.connect(DB)
-    cur  = conn.cursor()
+    cur = conn.cursor()
     cur.execute(
         "INSERT INTO predictions (source, user_id, predicted_mark, result) VALUES (?,?,?,?)",
         (source, student_id or form.get("student_id"), score, status),
@@ -184,9 +184,7 @@ def final_sem_predict_page():
     prediction = None
     if request.method == "POST":
         prediction = _compute_prediction(
-            request.form,
-            student_id=request.args.get("student_id"),
-            source="final_sem"
+            request.form, student_id=request.args.get("student_id"), source="final_sem"
         )
     return render_template("final_sem_predict.html", prediction=prediction)
 
@@ -196,9 +194,9 @@ def final_sem_predict_page():
 
 def get_next_student_id():
     conn = sqlite3.connect(DB)
-    cur  = conn.cursor()
+    cur = conn.cursor()
     cur.execute("SELECT student_id FROM students ORDER BY id DESC LIMIT 1")
-    row  = cur.fetchone()
+    row = cur.fetchone()
     conn.close()
     if row and row[0]:
         num = int(row[0].replace(STUDENT_PREFIX, ""))
@@ -208,9 +206,9 @@ def get_next_student_id():
 
 def get_next_teacher_id():
     conn = sqlite3.connect(DB)
-    cur  = conn.cursor()
+    cur = conn.cursor()
     cur.execute("SELECT teacher_id FROM teachers ORDER BY id DESC LIMIT 1")
-    row  = cur.fetchone()
+    row = cur.fetchone()
     conn.close()
     if row and row[0]:
         num = int(row[0].replace(TEACHER_PREFIX, ""))
@@ -221,7 +219,7 @@ def get_next_teacher_id():
 def insert_student(name, student_id, password):
     try:
         conn = sqlite3.connect(DB)
-        cur  = conn.cursor()
+        cur = conn.cursor()
         cur.execute(
             "INSERT INTO students (name, student_id, password) VALUES (?,?,?)",
             (name, student_id, password),
@@ -236,9 +234,9 @@ def insert_student(name, student_id, password):
 
 def check_student(student_id, password):
     conn = sqlite3.connect(DB)
-    cur  = conn.cursor()
+    cur = conn.cursor()
     cur.execute("SELECT password FROM students WHERE student_id=?", (student_id,))
-    row  = cur.fetchone()
+    row = cur.fetchone()
     conn.close()
     if not row:
         return False
@@ -248,7 +246,7 @@ def check_student(student_id, password):
 def insert_teacher(name, teacher_id, password):
     try:
         conn = sqlite3.connect(DB)
-        cur  = conn.cursor()
+        cur = conn.cursor()
         cur.execute(
             "INSERT INTO teachers (name, teacher_id, password) VALUES (?,?,?)",
             (name, teacher_id, password),
@@ -263,9 +261,9 @@ def insert_teacher(name, teacher_id, password):
 
 def check_teacher(teacher_id, password):
     conn = sqlite3.connect(DB)
-    cur  = conn.cursor()
+    cur = conn.cursor()
     cur.execute("SELECT password FROM teachers WHERE teacher_id=?", (teacher_id,))
-    row  = cur.fetchone()
+    row = cur.fetchone()
     conn.close()
     if not row:
         return False
@@ -277,7 +275,7 @@ def check_teacher(teacher_id, password):
 
 def fetch_all_students():
     conn = sqlite3.connect(DB)
-    cur  = conn.cursor()
+    cur = conn.cursor()
     cur.execute("SELECT id, name, student_id FROM students")
     rows = cur.fetchall()
     conn.close()
@@ -286,7 +284,7 @@ def fetch_all_students():
 
 def fetch_all_teachers():
     conn = sqlite3.connect(DB)
-    cur  = conn.cursor()
+    cur = conn.cursor()
     cur.execute("SELECT id, name, teacher_id FROM teachers")
     rows = cur.fetchall()
     conn.close()
@@ -295,7 +293,7 @@ def fetch_all_teachers():
 
 def fetch_all_predictions():
     conn = sqlite3.connect(DB)
-    cur  = conn.cursor()
+    cur = conn.cursor()
     cur.execute("SELECT * FROM predictions ORDER BY timestamp DESC")
     rows = cur.fetchall()
     conn.close()
@@ -307,15 +305,15 @@ def fetch_all_predictions():
 
 @app.route("/student_signup", methods=["POST"])
 def student_signup():
-    data     = request.get_json(force=True) or {}
-    name     = data.get("name")
+    data = request.get_json(force=True) or {}
+    name = data.get("name")
     password = data.get("password")
 
     if not name or not password:
         return jsonify({"status": "error", "message": "Missing fields"}), 400
 
     student_id = get_next_student_id()
-    hashed     = generate_password_hash(password)
+    hashed = generate_password_hash(password)
 
     if insert_student(name, student_id, hashed):
         return jsonify({"status": "success", "student_id": student_id})
@@ -325,9 +323,9 @@ def student_signup():
 
 @app.route("/student_login", methods=["POST"])
 def student_login():
-    data       = request.get_json(force=True) or {}
+    data = request.get_json(force=True) or {}
     student_id = data.get("student_id")
-    password   = data.get("password")
+    password = data.get("password")
 
     if not student_id or not password:
         return jsonify({"status": "error"}), 400
@@ -343,15 +341,15 @@ def student_login():
 
 @app.route("/teacher_signup", methods=["POST"])
 def teacher_signup():
-    data       = request.get_json(force=True) or {}
-    name       = data.get("name")
-    password   = data.get("password")
+    data = request.get_json(force=True) or {}
+    name = data.get("name")
+    password = data.get("password")
 
     if not name or not password:
         return jsonify({"status": "error"}), 400
 
     teacher_id = get_next_teacher_id()
-    hashed     = generate_password_hash(password)
+    hashed = generate_password_hash(password)
 
     if insert_teacher(name, teacher_id, hashed):
         return jsonify({"status": "success", "teacher_id": teacher_id})
@@ -361,9 +359,9 @@ def teacher_signup():
 
 @app.route("/teacher_login", methods=["POST"])
 def teacher_login():
-    data       = request.get_json(force=True) or {}
+    data = request.get_json(force=True) or {}
     teacher_id = data.get("teacher_id")
-    password   = data.get("password")
+    password = data.get("password")
 
     if not teacher_id or not password:
         return jsonify({"status": "error"}), 400
@@ -372,6 +370,7 @@ def teacher_login():
         return jsonify({"status": "success"})
 
     return jsonify({"status": "invalid"})
+
 
 @app.route("/teacher_choice")
 def teacher_choice_page():
@@ -383,7 +382,7 @@ def teacher_choice_page():
 
 @app.route("/admin_login", methods=["POST"])
 def admin_login():
-    data     = request.get_json(force=True) or {}
+    data = request.get_json(force=True) or {}
     admin_id = data.get("admin_id", "").strip()
     password = data.get("password", "")
 
@@ -398,32 +397,54 @@ def admin_login():
 
 @app.route("/admin/students")
 def admin_students():
-    rows     = fetch_all_students()
+    rows = fetch_all_students()
     students = [{"db_id": r[0], "name": r[1], "student_id": r[2]} for r in rows]
     return jsonify({"students": students})
 
 
 @app.route("/admin/teachers")
 def admin_teachers():
-    rows     = fetch_all_teachers()
+    rows = fetch_all_teachers()
     teachers = [{"db_id": r[0], "name": r[1], "teacher_id": r[2]} for r in rows]
     return jsonify({"teachers": teachers})
 
 
 @app.route("/admin/predictions")
 def admin_predictions():
-    rows  = fetch_all_predictions()
+    rows = fetch_all_predictions()
     preds = []
     for r in rows:
-        preds.append({
-            "id":            r[0],
-            "source":        r[1],
-            "user_id":       r[2],
-            "predicted_mark": r[3],
-            "result":        r[4],
-            "timestamp":     r[5],
-        })
+        preds.append(
+            {
+                "id": r[0],
+                "source": r[1],
+                "user_id": r[2],
+                "predicted_mark": r[3],
+                "result": r[4],
+                "timestamp": r[5],
+            }
+        )
     return jsonify({"predictions": preds})
+
+
+@app.route("/admin/stats")
+def admin_stats():
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM students")
+    student_count = cur.fetchone()[0]
+    cur.execute("SELECT COUNT(*) FROM teachers")
+    teacher_count = cur.fetchone()[0]
+    cur.execute("SELECT COUNT(*) FROM predictions")
+    pred_count = cur.fetchone()[0]
+    conn.close()
+    return jsonify(
+        {
+            "students": student_count,
+            "teachers": teacher_count,
+            "predictions": pred_count,
+        }
+    )
 
 
 # ---------- ADMIN EDIT / DELETE ----------
@@ -431,29 +452,25 @@ def admin_predictions():
 
 @app.route("/admin/student/<student_id>", methods=["PUT"])
 def admin_edit_student(student_id):
-    data     = request.get_json(force=True) or {}
-    name     = data.get("name", "").strip()
+    data = request.get_json(force=True) or {}
+    name = data.get("name", "").strip()
     password = data.get("password", "")
 
     conn = sqlite3.connect(DB)
-    cur  = conn.cursor()
+    cur = conn.cursor()
 
     if name and password:
         hashed = generate_password_hash(password)
         cur.execute(
             "UPDATE students SET name=?, password=? WHERE student_id=?",
-            (name, hashed, student_id)
+            (name, hashed, student_id),
         )
     elif name:
-        cur.execute(
-            "UPDATE students SET name=? WHERE student_id=?",
-            (name, student_id)
-        )
+        cur.execute("UPDATE students SET name=? WHERE student_id=?", (name, student_id))
     elif password:
         hashed = generate_password_hash(password)
         cur.execute(
-            "UPDATE students SET password=? WHERE student_id=?",
-            (hashed, student_id)
+            "UPDATE students SET password=? WHERE student_id=?", (hashed, student_id)
         )
     else:
         conn.close()
@@ -467,7 +484,7 @@ def admin_edit_student(student_id):
 @app.route("/admin/student/<student_id>", methods=["DELETE"])
 def admin_delete_student(student_id):
     conn = sqlite3.connect(DB)
-    cur  = conn.cursor()
+    cur = conn.cursor()
     cur.execute("DELETE FROM students WHERE student_id=?", (student_id,))
     conn.commit()
     conn.close()
@@ -476,29 +493,25 @@ def admin_delete_student(student_id):
 
 @app.route("/admin/teacher/<teacher_id>", methods=["PUT"])
 def admin_edit_teacher(teacher_id):
-    data     = request.get_json(force=True) or {}
-    name     = data.get("name", "").strip()
+    data = request.get_json(force=True) or {}
+    name = data.get("name", "").strip()
     password = data.get("password", "")
 
     conn = sqlite3.connect(DB)
-    cur  = conn.cursor()
+    cur = conn.cursor()
 
     if name and password:
         hashed = generate_password_hash(password)
         cur.execute(
             "UPDATE teachers SET name=?, password=? WHERE teacher_id=?",
-            (name, hashed, teacher_id)
+            (name, hashed, teacher_id),
         )
     elif name:
-        cur.execute(
-            "UPDATE teachers SET name=? WHERE teacher_id=?",
-            (name, teacher_id)
-        )
+        cur.execute("UPDATE teachers SET name=? WHERE teacher_id=?", (name, teacher_id))
     elif password:
         hashed = generate_password_hash(password)
         cur.execute(
-            "UPDATE teachers SET password=? WHERE teacher_id=?",
-            (hashed, teacher_id)
+            "UPDATE teachers SET password=? WHERE teacher_id=?", (hashed, teacher_id)
         )
     else:
         conn.close()
@@ -512,7 +525,7 @@ def admin_edit_teacher(teacher_id):
 @app.route("/admin/teacher/<teacher_id>", methods=["DELETE"])
 def admin_delete_teacher(teacher_id):
     conn = sqlite3.connect(DB)
-    cur  = conn.cursor()
+    cur = conn.cursor()
     cur.execute("DELETE FROM teachers WHERE teacher_id=?", (teacher_id,))
     conn.commit()
     conn.close()
