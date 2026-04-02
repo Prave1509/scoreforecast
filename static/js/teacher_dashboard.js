@@ -8,5 +8,5 @@ function nextSem() {
 
 function finalSem() {
     // Opens the teacher dashboard for Final Semester prediction
-    window.open("https://teacher-dashboard-h0g3.onrender.com", '_blank');
+    window.open("http://localhost:8504", '_blank');
 }
