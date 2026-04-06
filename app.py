@@ -20,7 +20,7 @@ ADMIN_PASSWORD = "admin123"
 
 app = Flask(__name__)
 app.secret_key = "scoreforecast_secret_key"
-CORS(app)
+CORS(app) #allow html css for backend connectivity
 
 # database path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -54,7 +54,7 @@ def insert_prediction(source, user_id, predicted_mark, result):
 # ---------- FRONTEND PAGE ROUTES ----------
 
 
-@app.route("/")
+@app.route("/")  #connect frontend 
 def home():
     return render_template("index.html")
 
@@ -117,7 +117,7 @@ def admin_logout():
 # ---------- PREDICTION HELPER ----------
 
 
-def _compute_prediction(form, student_id=None, source="next_sem"):
+def _compute_prediction(form, student_id=None, source="next_sem"): #get inputs as ML formate 
     prev_score = float(form.get("prev_score", 0))
     attendance = float(form.get("attendance", 0))
     arrears = float(form.get("arrears", 0))
@@ -147,12 +147,12 @@ def _compute_prediction(form, student_id=None, source="next_sem"):
         "result_Pass": 1,
     }
 
-    features = np.array(list(input_data.values())).reshape(1, -1)
+    features = np.array(list(input_data.values())).reshape(1, -1) #send the values into array formate 
     model_dir = os.path.join(BASE_DIR, "models")
-    clf = joblib.load(os.path.join(model_dir, "best_classification_model.joblib"))
+    clf = joblib.load(os.path.join(model_dir, "best_classification_model.joblib")) #upload the models
     reg = joblib.load(os.path.join(model_dir, "best_regression_model.joblib"))
 
-    status_pred = clf.predict(features)[0]
+    status_pred = clf.predict(features)[0] #predict the scores,results
     score_pred = reg.predict(features)[0]
     status = "Pass" if status_pred == 1 else "Fail"
     score = round(score_pred, 2)
