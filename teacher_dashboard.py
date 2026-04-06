@@ -119,7 +119,7 @@ COLUMN_ALIASES = {
     "residence": ["residence", "resident", "day_scholar_hosteller", "living", "stay"],
     "travel_time": ["travel_time", "travel time", "traveltime", "travel_hr", "commute_time", "commute"],
     "part_time_job": ["part_time_job", "part time job", "parttimejob", "parttime", "part_time", "job"],
-    "final_percentage": ["final_percentage", "final percentage", "finalpercentage", "final_%", "final_percent", "final_marks", "final"],
+    
 }
 
 
@@ -192,7 +192,7 @@ def show_teacher_dashboard():
         "sem1", "sem2", "sem3", "sem4", "sem5",
         "attendance", "arrears_count", "study_hours", "sleep_hours",
         "social_media", "stress_level", "internet_access",
-        "residence", "travel_time", "part_time_job", "final_percentage",
+        "residence", "travel_time", "part_time_job", 
     ]
 
     st.title("📤 Upload Student Dataset")
@@ -220,7 +220,7 @@ def show_teacher_dashboard():
                     "resident, living",
                     "travel time, commute",
                     "part time job, parttime",
-                    "final percentage, final_marks",
+                    
                 ],
             }
         )
