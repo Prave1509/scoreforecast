@@ -440,13 +440,7 @@ def show_next_sem():
 
             st.markdown("""
             <div class="model-info-box">
-                <b>Regression Model — Predicts the next semester mark</b><br>
-                Two regression algorithms were tested: <b>Linear Regression</b> and <b>Random Forest Regressor</b>.
-                Both models achieved an R² score of <b>0.96</b>, meaning they explain 96% of the variation
-                in student marks. However, <b>Linear Regression</b> achieved a slightly lower MAE of <b>5.07</b>
-                compared to Random Forest's MAE of 5.20, meaning its predictions were on average closer to
-                the actual marks. Lower MAE indicates better accuracy, so <b>Linear Regression</b> was
-                selected as the final regression model.
+                Two regression algorithms were tested: <b>Linear Regression and Random Forest Regressor</b>. Both models achieved an R² score of <b>0.96</b>, indicating that they explain 96% of the variation in student marks. While Linear Regression achieved a slightly lower <b>MAE (5.07) compared to Random Forest (5.20)</b>, the difference is minimal. <b>Random Forest Regressor </b>was selected as the final model because it can capture non-linear relationships, handle feature interactions effectively, and is more robust to noise and outliers. Therefore, it is expected to generalize better for real-world data.</b>
             </div>
             """, unsafe_allow_html=True)
 
@@ -457,7 +451,7 @@ def show_next_sem():
                 Both models achieved identical results — an Accuracy of <b>0.95</b>, Precision of <b>0.94</b>,
                 Recall of <b>0.96</b>, and F1-Score of <b>0.95</b>. Since both models perform equally well,
                 either can be used. This confirms the dataset is well-structured and both algorithms
-                are well-suited for this Pass/Fail prediction task.
+                are well-suited for this Pass/Fail prediction task.Random Forest Classifier selected because it provides high accuracy, handles non-linear data effectively, and reduces overfitting by combining multiple decision trees. It is also robust to noise and works well with both small and large datasets, making it suitable for real-world classification problems.
             </div>
             """, unsafe_allow_html=True)
 
@@ -500,7 +494,8 @@ def show_next_sem():
                 ax.tick_params(colors='#718096')
                 plt.tight_layout()
                 st.pyplot(fig)
-                st.caption("Both models achieve R²=0.96. Linear Regression wins with lower MAE (5.07 vs 5.20) — selected as final model.")
+                st.caption("Both models achieved an R² score of 0.96. Although Linear Regression had slightly lower MAE, the difference was negligible. Random Forest was selected because it handles non-linear patterns, reduces overfitting, and provides better robustness for real-world data.")
+
 
             # ── Classification Chart: Accuracy, Precision, Recall, F1 grouped bar ──
             with col_m2:
@@ -539,7 +534,7 @@ def show_next_sem():
                 ax2.tick_params(colors='#718096')
                 plt.tight_layout()
                 st.pyplot(fig2)
-                st.caption("Both classifiers achieve identical scores across all metrics — both are equally reliable for Pass/Fail prediction.")
+                st.caption("Both classifiers achieve identical scores across all metrics — both are equally reliable for Pass/Fail prediction.Random Forest Classifier wins because it provides high accuracy, handles non-linear data effectively, and reduces overfitting by combining multiple decision trees. It is also robust to noise and works well with both small and large datasets, making it suitable for real-world classification problems.")
 
 if __name__ == "__main__":
     show_next_sem()
