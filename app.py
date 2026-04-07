@@ -20,7 +20,7 @@ ADMIN_PASSWORD = "admin123"
 
 app = Flask(__name__)
 app.secret_key = "scoreforecast_secret_key"
-CORS(app) #allow html css for backend connectivity
+CORS(app)  # allow html css for backend connectivity
 
 # database path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -54,7 +54,7 @@ def insert_prediction(source, user_id, predicted_mark, result):
 # ---------- FRONTEND PAGE ROUTES ----------
 
 
-@app.route("/")  #connect frontend 
+@app.route("/")
 def home():
     return render_template("index.html")
 
@@ -117,7 +117,7 @@ def admin_logout():
 # ---------- PREDICTION HELPER ----------
 
 
-def _compute_prediction(form, student_id=None, source="next_sem"): #get inputs as ML formate 
+def _compute_prediction(form, student_id=None, source="next_sem"):
     prev_score = float(form.get("prev_score", 0))
     attendance = float(form.get("attendance", 0))
     arrears = float(form.get("arrears", 0))
@@ -147,12 +147,12 @@ def _compute_prediction(form, student_id=None, source="next_sem"): #get inputs a
         "result_Pass": 1,
     }
 
-    features = np.array(list(input_data.values())).reshape(1, -1) #send the values into array formate 
+    features = np.array(list(input_data.values())).reshape(1, -1)
     model_dir = os.path.join(BASE_DIR, "models")
-    clf = joblib.load(os.path.join(model_dir, "best_classification_model.joblib")) #upload the models
+    clf = joblib.load(os.path.join(model_dir, "best_classification_model.joblib"))
     reg = joblib.load(os.path.join(model_dir, "best_regression_model.joblib"))
 
-    status_pred = clf.predict(features)[0] #predict the scores,results
+    status_pred = clf.predict(features)[0]
     score_pred = reg.predict(features)[0]
     status = "Pass" if status_pred == 1 else "Fail"
     score = round(score_pred, 2)
@@ -189,30 +189,43 @@ def final_sem_predict_page():
     return render_template("final_sem_predict.html", prediction=prediction)
 
 
-# ---------- DATABASE HELPERS ----------
+# ---------- ID GENERATORS ----------
 
 
 def get_next_student_id():
     conn = sqlite3.connect(DB)
     cur = conn.cursor()
-    cur.execute("SELECT student_id FROM students ORDER BY id DESC LIMIT 1")
-    row = cur.fetchone()
+    # Use MAX on the numeric suffix to avoid gaps from deletions breaking ORDER BY id
+    cur.execute("SELECT student_id FROM students")
+    rows = cur.fetchall()
     conn.close()
-    if row and row[0]:
-        num = int(row[0].replace(STUDENT_PREFIX, ""))
-        return f"{STUDENT_PREFIX}{num+1:03d}"
+    if rows:
+        nums = []
+        for (sid,) in rows:
+            try:
+                nums.append(int(sid.replace(STUDENT_PREFIX, "")))
+            except ValueError:
+                pass
+        if nums:
+            return f"{STUDENT_PREFIX}{max(nums)+1:03d}"
     return f"{STUDENT_PREFIX}001"
 
 
 def get_next_teacher_id():
     conn = sqlite3.connect(DB)
     cur = conn.cursor()
-    cur.execute("SELECT teacher_id FROM teachers ORDER BY id DESC LIMIT 1")
-    row = cur.fetchone()
+    cur.execute("SELECT teacher_id FROM teachers")
+    rows = cur.fetchall()
     conn.close()
-    if row and row[0]:
-        num = int(row[0].replace(TEACHER_PREFIX, ""))
-        return f"{TEACHER_PREFIX}{num+1:03d}"
+    if rows:
+        nums = []
+        for (tid,) in rows:
+            try:
+                nums.append(int(tid.replace(TEACHER_PREFIX, "")))
+            except ValueError:
+                pass
+        if nums:
+            return f"{TEACHER_PREFIX}{max(nums)+1:03d}"
     return f"{TEACHER_PREFIX}001"
 
 
@@ -452,84 +465,121 @@ def admin_stats():
 
 @app.route("/admin/student/<student_id>", methods=["PUT"])
 def admin_edit_student(student_id):
-    data = request.get_json(force=True) or {}
+    # Support both JSON body and form data
+    data = request.get_json(force=True, silent=True) or {}
     name = data.get("name", "").strip()
     password = data.get("password", "")
+
+    if not name and not password:
+        return jsonify({"status": "error", "message": "Nothing to update"}), 400
 
     conn = sqlite3.connect(DB)
     cur = conn.cursor()
 
-    if name and password:
-        hashed = generate_password_hash(password)
-        cur.execute(
-            "UPDATE students SET name=?, password=? WHERE student_id=?",
-            (name, hashed, student_id),
-        )
-    elif name:
-        cur.execute("UPDATE students SET name=? WHERE student_id=?", (name, student_id))
-    elif password:
-        hashed = generate_password_hash(password)
-        cur.execute(
-            "UPDATE students SET password=? WHERE student_id=?", (hashed, student_id)
-        )
-    else:
-        conn.close()
-        return jsonify({"status": "error", "message": "Nothing to update"}), 400
+    try:
+        if name and password:
+            hashed = generate_password_hash(password)
+            cur.execute(
+                "UPDATE students SET name=?, password=? WHERE student_id=?",
+                (name, hashed, student_id),
+            )
+        elif name:
+            cur.execute(
+                "UPDATE students SET name=? WHERE student_id=?", (name, student_id)
+            )
+        else:
+            hashed = generate_password_hash(password)
+            cur.execute(
+                "UPDATE students SET password=? WHERE student_id=?",
+                (hashed, student_id),
+            )
 
-    conn.commit()
-    conn.close()
-    return jsonify({"status": "success"})
+        if cur.rowcount == 0:
+            return jsonify({"status": "error", "message": "Student not found"}), 404
+
+        conn.commit()
+        return jsonify({"status": "success"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        conn.close()
 
 
 @app.route("/admin/student/<student_id>", methods=["DELETE"])
 def admin_delete_student(student_id):
     conn = sqlite3.connect(DB)
     cur = conn.cursor()
-    cur.execute("DELETE FROM students WHERE student_id=?", (student_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({"status": "success"})
+    try:
+        cur.execute("DELETE FROM students WHERE student_id=?", (student_id,))
+        if cur.rowcount == 0:
+            return jsonify({"status": "error", "message": "Student not found"}), 404
+        conn.commit()
+        return jsonify({"status": "success"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        conn.close()
 
 
 @app.route("/admin/teacher/<teacher_id>", methods=["PUT"])
 def admin_edit_teacher(teacher_id):
-    data = request.get_json(force=True) or {}
+    data = request.get_json(force=True, silent=True) or {}
     name = data.get("name", "").strip()
     password = data.get("password", "")
+
+    if not name and not password:
+        return jsonify({"status": "error", "message": "Nothing to update"}), 400
 
     conn = sqlite3.connect(DB)
     cur = conn.cursor()
 
-    if name and password:
-        hashed = generate_password_hash(password)
-        cur.execute(
-            "UPDATE teachers SET name=?, password=? WHERE teacher_id=?",
-            (name, hashed, teacher_id),
-        )
-    elif name:
-        cur.execute("UPDATE teachers SET name=? WHERE teacher_id=?", (name, teacher_id))
-    elif password:
-        hashed = generate_password_hash(password)
-        cur.execute(
-            "UPDATE teachers SET password=? WHERE teacher_id=?", (hashed, teacher_id)
-        )
-    else:
-        conn.close()
-        return jsonify({"status": "error", "message": "Nothing to update"}), 400
+    try:
+        if name and password:
+            hashed = generate_password_hash(password)
+            cur.execute(
+                "UPDATE teachers SET name=?, password=? WHERE teacher_id=?",
+                (name, hashed, teacher_id),
+            )
+        elif name:
+            cur.execute(
+                "UPDATE teachers SET name=? WHERE teacher_id=?", (name, teacher_id)
+            )
+        else:
+            hashed = generate_password_hash(password)
+            cur.execute(
+                "UPDATE teachers SET password=? WHERE teacher_id=?",
+                (hashed, teacher_id),
+            )
 
-    conn.commit()
-    conn.close()
-    return jsonify({"status": "success"})
+        if cur.rowcount == 0:
+            return jsonify({"status": "error", "message": "Teacher not found"}), 404
+
+        conn.commit()
+        return jsonify({"status": "success"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        conn.close()
 
 
 @app.route("/admin/teacher/<teacher_id>", methods=["DELETE"])
 def admin_delete_teacher(teacher_id):
     conn = sqlite3.connect(DB)
     cur = conn.cursor()
-    cur.execute("DELETE FROM teachers WHERE teacher_id=?", (teacher_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({"status": "success"})
+    try:
+        cur.execute("DELETE FROM teachers WHERE teacher_id=?", (teacher_id,))
+        if cur.rowcount == 0:
+            return jsonify({"status": "error", "message": "Teacher not found"}), 404
+        conn.commit()
+        return jsonify({"status": "success"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        conn.close()
 
 
 # ---------- RUN SERVER ----------

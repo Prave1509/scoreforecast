@@ -4,8 +4,9 @@ console.log('admin_dashboard.js loaded');
 let allStudents = [];
 let allTeachers = [];
 let allPredictions = [];
+let overviewChartInstance = null; // track chart instance to destroy before re-render
 
-// ─── Popup (matches your existing .popup style) ───────────────────────────────
+// ─── Popup ────────────────────────────────────────────────────────────────────
 function showToast(message, type = 'success') {
   const popup = document.getElementById('popup');
   popup.textContent = message;
@@ -17,7 +18,6 @@ function showToast(message, type = 'success') {
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-// Close modals when clicking overlay
 document.getElementById('editModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal('editModal');
 });
@@ -29,16 +29,12 @@ document.getElementById('editCancelBtn').addEventListener('click',   () => close
 document.getElementById('deleteCancelBtn').addEventListener('click', () => closeModal('deleteModal'));
 
 // ─── Validation helpers ───────────────────────────────────────────────────────
-
-/**
- * Name: letters + spaces only, 2–50 chars, no email/numbers
- */
 function validateName(name) {
   const t = name.trim();
   if (t.length < 2 || t.length > 50) return 'Name must be 2–50 characters.';
   if (t.includes('@') || /\.\w{2,}$/.test(t)) return 'Enter a real name, not an email address.';
   if (!/^[\p{L}\s]+$/u.test(t)) return 'Name must contain letters and spaces only.';
-  return null; // valid
+  return null;
 }
 
 function validatePassword(pw) {
@@ -53,7 +49,7 @@ function showFieldErr(elId, msg) {
 }
 
 // ─── State for edit/delete ────────────────────────────────────────────────────
-let editState  = { type: null, id: null }; // type = 'student' | 'teacher'
+let editState   = { type: null, id: null };
 let deleteState = { type: null, id: null };
 
 // ─── Fetch & Populate ─────────────────────────────────────────────────────────
@@ -71,9 +67,9 @@ async function fetchAndPopulate() {
     const predsData    = await predRes.json();
     const statsData    = await statsRes.json();
 
-    allStudents = studentsData.students || [];
-    allTeachers = teachersData.teachers || [];
-    allPredictions = predsData.predictions || [];
+    allStudents    = studentsData.students    || [];
+    allTeachers    = teachersData.teachers    || [];
+    allPredictions = predsData.predictions    || [];
 
     updateStats(statsData);
     renderChart(statsData);
@@ -90,15 +86,20 @@ async function fetchAndPopulate() {
 
 // ─── Update Stats ────────────────────────────────────────────────────────────
 function updateStats(stats) {
-  document.getElementById('totalStudents').textContent = stats.students;
-  document.getElementById('totalTeachers').textContent = stats.teachers;
+  document.getElementById('totalStudents').textContent    = stats.students;
+  document.getElementById('totalTeachers').textContent    = stats.teachers;
   document.getElementById('totalPredictions').textContent = stats.predictions;
 }
 
 // ─── Render Chart ────────────────────────────────────────────────────────────
 function renderChart(stats) {
+  // Destroy previous chart instance to prevent "Canvas already in use" error
+  if (overviewChartInstance) {
+    overviewChartInstance.destroy();
+    overviewChartInstance = null;
+  }
   const ctx = document.getElementById('overviewChart').getContext('2d');
-  new Chart(ctx, {
+  overviewChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: ['Students', 'Teachers', 'Predictions'],
@@ -106,17 +107,13 @@ function renderChart(stats) {
         label: 'Count',
         data: [stats.students, stats.teachers, stats.predictions],
         backgroundColor: ['#0d1bd1', '#28a745', '#ffc107'],
-        borderColor: ['#0a14a8', '#1e7e34', '#e0a800'],
+        borderColor:     ['#0a14a8', '#1e7e34', '#e0a800'],
         borderWidth: 1
       }]
     },
     options: {
       responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
+      scales: { y: { beginAtZero: true } }
     }
   });
 }
@@ -139,21 +136,23 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 // ─── Search ──────────────────────────────────────────────────────────────────
 document.getElementById('studentSearch').addEventListener('input', (e) => {
   const query = e.target.value.toLowerCase();
-  const filtered = allStudents.filter(s =>
+  populateStudents(allStudents.filter(s =>
     s.name.toLowerCase().includes(query) || s.student_id.toLowerCase().includes(query)
-  );
-  populateStudents(filtered);
+  ));
 });
 
 document.getElementById('teacherSearch').addEventListener('input', (e) => {
   const query = e.target.value.toLowerCase();
-  const filtered = allTeachers.filter(t =>
+  populateTeachers(allTeachers.filter(t =>
     t.name.toLowerCase().includes(query) || t.teacher_id.toLowerCase().includes(query)
-  );
-  populateTeachers(filtered);
+  ));
 });
 
 // ─── Populate functions ───────────────────────────────────────────────────────
+// NOTE: Instead of inline onclick with escaped strings (which breaks on special
+// characters like apostrophes), we use data attributes and event delegation.
+// This is the ROOT CAUSE fix for edit/delete not working.
+
 function populateStudents(list) {
   const tbody = document.querySelector('#studentsTable tbody');
   document.getElementById('studentCount').textContent = list.length;
@@ -167,12 +166,18 @@ function populateStudents(list) {
   list.forEach(s => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${s.db_id}</td>
+      <td>${escHtml(String(s.db_id))}</td>
       <td>${escHtml(s.name)}</td>
       <td>${escHtml(s.student_id)}</td>
       <td>
-        <button class="btn-edit"   onclick="openEditModal('student','${escAttr(s.student_id)}','${escAttr(s.name)}')">Edit</button>
-        <button class="btn-delete" onclick="openDeleteModal('student','${escAttr(s.student_id)}','${escAttr(s.name)}')">Delete</button>
+        <button class="btn-edit"
+          data-type="student"
+          data-id="${escHtml(s.student_id)}"
+          data-name="${escHtml(s.name)}">Edit</button>
+        <button class="btn-delete"
+          data-type="student"
+          data-id="${escHtml(s.student_id)}"
+          data-name="${escHtml(s.name)}">Delete</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -191,12 +196,18 @@ function populateTeachers(list) {
   list.forEach(t => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${t.db_id}</td>
+      <td>${escHtml(String(t.db_id))}</td>
       <td>${escHtml(t.name)}</td>
       <td>${escHtml(t.teacher_id)}</td>
       <td>
-        <button class="btn-edit"   onclick="openEditModal('teacher','${escAttr(t.teacher_id)}','${escAttr(t.name)}')">Edit</button>
-        <button class="btn-delete" onclick="openDeleteModal('teacher','${escAttr(t.teacher_id)}','${escAttr(t.name)}')">Delete</button>
+        <button class="btn-edit"
+          data-type="teacher"
+          data-id="${escHtml(t.teacher_id)}"
+          data-name="${escHtml(t.name)}">Edit</button>
+        <button class="btn-delete"
+          data-type="teacher"
+          data-id="${escHtml(t.teacher_id)}"
+          data-name="${escHtml(t.name)}">Delete</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -215,14 +226,36 @@ function populatePredictions(list) {
   list.forEach(p => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${p.id}</td>
+      <td>${escHtml(String(p.id))}</td>
       <td>${escHtml(p.source)}</td>
       <td>${escHtml(p.user_id || '')}</td>
-      <td>${escHtml(p.predicted_mark)}</td>
+      <td>${escHtml(String(p.predicted_mark))}</td>
       <td>${escHtml(p.result)}</td>
       <td>${escHtml(p.timestamp)}</td>`;
     tbody.appendChild(tr);
   });
+}
+
+// ─── Event Delegation for Edit/Delete buttons ─────────────────────────────────
+// Attach ONE listener to each table body — handles all dynamically added rows.
+// This replaces the brittle inline onclick approach entirely.
+
+document.querySelector('#studentsTable tbody').addEventListener('click', handleTableClick);
+document.querySelector('#teachersTable tbody').addEventListener('click', handleTableClick);
+
+function handleTableClick(e) {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+
+  const type = btn.dataset.type;   // 'student' or 'teacher'
+  const id   = btn.dataset.id;
+  const name = btn.dataset.name;
+
+  if (btn.classList.contains('btn-edit')) {
+    openEditModal(type, id, name);
+  } else if (btn.classList.contains('btn-delete')) {
+    openDeleteModal(type, id, name);
+  }
 }
 
 // ─── Edit Modal ───────────────────────────────────────────────────────────────
@@ -257,8 +290,8 @@ document.getElementById('editSaveBtn').addEventListener('click', async () => {
   if (pw) body.password = pw;
 
   const url = editState.type === 'student'
-    ? `/admin/student/${editState.id}`
-    : `/admin/teacher/${editState.id}`;
+    ? `/admin/student/${encodeURIComponent(editState.id)}`
+    : `/admin/teacher/${encodeURIComponent(editState.id)}`;
 
   try {
     const res  = await fetch(url, {
@@ -268,7 +301,7 @@ document.getElementById('editSaveBtn').addEventListener('click', async () => {
     });
     const data = await res.json();
 
-    if (res.ok && data.status !== 'error') {
+    if (res.ok && data.status === 'success') {
       showToast(`${capitalize(editState.type)} updated successfully.`, 'success');
       closeModal('editModal');
       fetchAndPopulate();
@@ -291,14 +324,14 @@ function openDeleteModal(type, id, name) {
 
 document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
   const url = deleteState.type === 'student'
-    ? `/admin/student/${deleteState.id}`
-    : `/admin/teacher/${deleteState.id}`;
+    ? `/admin/student/${encodeURIComponent(deleteState.id)}`
+    : `/admin/teacher/${encodeURIComponent(deleteState.id)}`;
 
   try {
     const res  = await fetch(url, { method: 'DELETE' });
     const data = await res.json();
 
-    if (res.ok && data.status !== 'error') {
+    if (res.ok && data.status === 'success') {
       showToast(`${capitalize(deleteState.type)} deleted.`, 'success');
       closeModal('deleteModal');
       fetchAndPopulate();
@@ -317,11 +350,8 @@ function escHtml(str) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function escAttr(str) {
-  return String(str ?? '').replace(/'/g, "\\'");
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function capitalize(str) {
